@@ -9,7 +9,7 @@ app.use(cors());
 
 const port = process.env.PORT || 5000
 const ip = process.env.IP || '0.0.0.0'
-app.listen(port, ip, () => console.log(`Listening at : ${port}`))
+app.listen(port, ip, () => console.log(`Listening at : http://${ip}:${port}`))
 
 
 const CLIENT_KEY = 'awybd3kl4d2abws8'
