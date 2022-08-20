@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const path = require('path')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 require('dotenv').config()
@@ -15,7 +16,7 @@ app.listen(port, ip, () => console.log(`Listening at : ${port}`))
 const CLIENT_KEY = 'awybd3kl4d2abws8'
 const SERVER_ENDPOINT_REDIRECT = 'https://www.andrewsthilaire.com/privacy-policy'
 
-app.get('/', (req, res) => res.send('Welcome to WonderLoo Park'))
+app.get('/', (req, res) => res.sendFile(path.join(__dirname + '/index.html')))
 
 app.get('/oauth', (req, res) => {
     const csrfState = Math.random().toString(36).substring(2);
