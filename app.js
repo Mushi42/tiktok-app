@@ -13,8 +13,8 @@ const ip = process.env.IP || '0.0.0.0'
 app.listen(port, ip, () => console.log(`Listening at : http://${ip}:${port}`))
 
 
-const CLIENT_KEY = 'awybd3kl4d2abws8'
-const SERVER_ENDPOINT_REDIRECT = 'https://www.andrewsthilaire.com/privacy-policy'
+const CLIENT_KEY = 'awfxi761fypcsblj'
+const SERVER_ENDPOINT_REDIRECT = 'http://18.217.9.246:3000/redirect'
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname + '/index.html')))
 
@@ -35,8 +35,11 @@ app.get('/oauth', (req, res) => {
     res.redirect(url);
 })
 
-app.post('postVideo', () => {
-    res.send('Video Kit will be used here')
+app.post('post-video', (req, res) => {
+    const { listings } = req.body
+    if (listings && listings.length)
+        fetch('https://open-api.tiktok.com/share/video/upload/')
+
 })
 
 app.get('/redirect', (req, res) => {
