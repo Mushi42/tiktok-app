@@ -8,12 +8,14 @@ app.use(cookieParser());
 app.use(cors());
 
 const port = process.env.PORT || 5000
-const ip  = process.env.IP || '0.0.0.0'
+const ip = process.env.IP || '0.0.0.0'
 app.listen(port, () => console.log(`Listening at : ${port}`))
 
 
 const CLIENT_KEY = 'awybd3kl4d2abws8'
 const SERVER_ENDPOINT_REDIRECT = 'https://www.andrewsthilaire.com/privacy-policy'
+
+app.get('/', (req, res) => res.send('Welcome to WonderLoo Park'))
 
 app.get('/oauth', (req, res) => {
     const csrfState = Math.random().toString(36).substring(2);
