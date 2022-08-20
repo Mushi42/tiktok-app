@@ -8,6 +8,7 @@ app.use(cookieParser());
 app.use(cors());
 
 const port = process.env.PORT || 5000
+const ip  = process.env.IP || '0.0.0.0'
 app.listen(port, () => console.log(`Listening at : ${port}`))
 
 
