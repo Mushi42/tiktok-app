@@ -44,7 +44,7 @@ app.get('/oauth', (req, res) => {
 app.post('/post-video', (req, res) => {
     console.log(req.headers)
     const { listings } = req.body
-    const { open_id, access_token } = req.headers
+    const { open_id, access_token } = req.query
 
     console.log('Open Id', open_id, access_token)
     if (open_id) {
