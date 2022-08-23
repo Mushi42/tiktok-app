@@ -1,12 +1,17 @@
 const express = require('express');
+const https = require('https')
+var FormData = require('form-data');
+var fs = require('fs');
 const app = express();
 const path = require('path')
 const cookieParser = require('cookie-parser');
+const axios = require('axios')
 const cors = require('cors');
 require('dotenv').config()
 
 app.use(cookieParser());
-app.use(cors());
+app.use(express.json());
+app.use(cors({ allowedHeaders: ['access_token', 'open_id'] }));
 
 const port = process.env.PORT || 5000
 const ip = process.env.IP || '0.0.0.0'
@@ -15,7 +20,7 @@ app.listen(port, ip, () => console.log(`Listening at : http://${ip}:${port}`))
 
 const CLIENT_KEY = 'awybd3kl4d2abws8'
 const CLIENT_SECRET = 'f2d14fdd32d559d6f89d569a3f00538a'
-const SERVER_ENDPOINT_REDIRECT = 'https://tiktok.andrewsthilaire.com'
+const SERVER_ENDPOINT_REDIRECT = 'https://tiktok.andrewsthilaire.com/redirect'
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname + '/index.html')))
 
@@ -36,19 +41,50 @@ app.get('/oauth', (req, res) => {
     res.redirect(url);
 })
 
-app.post('post-video', (req, res) => {
+app.post('/post-video', (req, res) => {
+    console.log(req.headers)
     const { listings } = req.body
-    const url_post_video = 'https://open-api.tiktok.com/share/video/upload/'
-    if (listings && listings.length) {
-        const payload = {
+    const { open_id, access_token } = req.headers
 
-        }
-        fetch(url_post_video, { method: 'post', body: payload })
-            .then(res => res.json())
-            .then(json => {
-                res.send(json);
+    console.log('Open Id', open_id, access_token)
+    if (open_id) {
+
+        const url_post_video = 'https://open-api.tiktok.com/share/video/upload/'
+        if (listings && listings.length) {
+            const videoName = "new-video.mp4"
+            const file = fs.createWriteStream(videoName);
+            const request = https.get(listings[0].video, function (response) {
+                response.pipe(file);
+
+                file.on("finish", () => {
+                    file.close();
+                    console.log("Download Completed");
+
+                    var data = new FormData();
+                    data.append('video', fs.createReadStream(videoName));
+
+                    var config = {
+                        method: 'post',
+                        url: `${url_post_video}?open_id=${open_id}&access_token=${access_token}`,
+                        headers: {
+                            ...data.getHeaders()
+                        },
+                        data: data
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                            res.json(response.data);
+                        })
+                        .catch(function (error) {
+                            res.send(error);
+                        });
+
+                });
             });
-    }
+        }
+    } else
+        res.send('Unauthorized')
 
 })
 
@@ -83,9 +119,8 @@ app.get('/redirect', (req, res) => {
     url_access_token += '&code=' + code;
     url_access_token += '&grant_type=authorization_code';
 
-    fetch(url_access_token, { method: 'post' })
-        .then(res => res.json())
-        .then(json => {
-            res.send(json);
-        });
+    axios.post(url_access_token).then(({ data }) => {
+        console.log(data)
+        res.json(data);
+    });
 })
